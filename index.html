@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finamex Admin | Mercedes-Benz & Maybach</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary-gold: #d4af37;
+            --dark-bg: #050505;
+            --sidebar-bg: #0f0f0f;
+            --card-bg: #161616;
+            --hover-gold: #f1c40f;
+            --text-color: #f0f0f0;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        body { background-color: var(--dark-bg); color: var(--text-color); display: flex; min-height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid #222;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .sidebar-logo { padding: 40px 20px; text-align: center; border-bottom: 1px solid #222; }
+        .sidebar-logo h2 { font-family: 'Playfair Display', serif; color: var(--primary-gold); letter-spacing: 3px; font-size: 26px; }
+        .sidebar-logo p { font-size: 10px; color: #666; letter-spacing: 4px; margin-top: 5px; }
+
+        .menu { list-style: none; margin-top: 20px; flex: 1; }
+        .menu-item {
+            padding: 18px 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            color: #888;
+            transition: var(--transition);
+            font-weight: 400;
+        }
+        .menu-item i { margin-right: 15px; width: 20px; font-size: 18px; }
+        .menu-item:hover, .menu-item.active {
+            color: var(--white);
+            background: linear-gradient(90deg, rgba(212, 175, 55, 0.1) 0%, transparent 100%);
+            border-left: 5px solid var(--primary-gold);
+            color: var(--primary-gold);
+        }
+
+        /* MAIN CONTENT */
+        .main-content { margin-left: 280px; width: calc(100% - 280px); padding: 40px; }
+        
+        /* TABS */
+        .tab-content { display: none; animation: slideUp 0.6s ease; }
+        .tab-content.active { display: block; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CARDS & GRIDS */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; margin-bottom: 35px; }
+        .stat-card { 
+            background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid #222; 
+            transition: var(--transition); position: relative; overflow: hidden;
+        }
+        .stat-card:hover { border-color: var(--primary-gold); transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .stat-card h3 { font-size: 12px; color: #666; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .stat-card p { font-size: 28px; color: var(--white); font-weight: 700; font-family: 'Playfair Display'; }
+        .stat-card .trend { font-size: 12px; color: #2ed573; margin-top: 10px; display: block; }
+
+        /* CUSTOMER LIST STYLE */
+        .customer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .customer-card { 
+            background: var(--card-bg); padding: 20px; border-radius: 15px; border: 1px solid #222;
+            display: flex; align-items: center; gap: 15px; transition: 0.3s;
+        }
+        .customer-card:hover { background: #1f1f1f; }
+        .customer-avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--primary-gold); object-fit: cover; }
+        .cust-info h4 { color: var(--white); font-size: 16px; margin-bottom: 4px; }
+        .cust-info p { color: #666; font-size: 13px; }
+        .badge { font-size: 10px; background: #d4af3733; color: var(--primary-gold); padding: 2px 8px; border-radius: 4px; }
+
+        /* TABLE */
+        .table-container { background: var(--card-bg); border-radius: 12px; border: 1px solid #222; overflow: hidden; padding: 10px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 20px; color: #666; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid #222; }
+        td { padding: 20px; border-bottom: 1px solid #111; vertical-align: middle; }
+        .car-thumb { width: 80px; border-radius: 8px; transition: 0.3s; }
+        .car-thumb:hover { transform: scale(1.1); }
+
+        header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
+        .header-left h1 { font-family: 'Playfair Display'; font-size: 32px; color: var(--white); }
+        .header-left p { color: #555; font-size: 14px; margin-top: 5px; }
+
+        .btn-action { color: #555; cursor: pointer; margin: 0 5px; transition: 0.3s; }
+        .btn-action:hover { color: var(--primary-gold); }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <h2>FINAMEX</h2>
+            <p>MERCEDES-BENZ & MAYBACH</p>
+        </div>
+        <ul class="menu">
+            <li class="menu-item active" onclick="showTab('dashboard')"><i class="fas fa-home"></i> Tổng quát</li>
+            <li class="menu-item" onclick="showTab('products')"><i class="fas fa-car-side"></i> Danh sách xe</li>
+            <li class="menu-item" onclick="showTab('orders')"><i class="fas fa-file-invoice-dollar"></i> Đơn đặt hàng</li>
+            <li class="menu-item" onclick="showTab('customers')"><i class="fas fa-user-tie"></i> Khách hàng VIP</li>
+            <li class="menu-item"><i class="fas fa-cog"></i> Cấu hình hệ thống</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="header-left">
+                <h1 id="page-title">Tổng quan hệ thống</h1>
+                <p>Chi nhánh: <strong>Finamex Hà Nội</strong> | <span id="current-date"></span></p>
+            </div>
+            <div style="text-align: right">
+                <p style="font-size: 14px; color: var(--primary-gold);">Xin chào, Admin Vinh</p>
+                <small style="color: #444;">Chức vụ: Quản lý chi nhánh</small>
+            </div>
+        </header>
+
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Doanh thu tuần này</h3>
+                    <p>42.8 tỷ VNĐ</p>
+                    <span class="trend"><i class="fas fa-arrow-up"></i> +15% so với tuần trước</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Xe đang trưng bày</h3>
+                    <p>18</p>
+                    <span class="trend" style="color: #666;">Cơ sở: 04 Maybach, 14 Mercedes</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Hẹn lái thử</h3>
+                    <p>24</p>
+                    <span class="trend"><i class="fas fa-clock"></i> 5 lịch đang chờ xác nhận</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Khách hàng mới</h3>
+                    <p>112</p>
+                    <span class="trend"><i class="fas fa-user-plus"></i> +22% tăng trưởng</span>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px;">
+                <div class="chart-container" style="background: var(--card-bg); padding: 25px; border-radius: 15px; border: 1px solid #222;">
+                    <h3 style="margin-bottom: 20px; font-family: 'Playfair Display'; color: var(--primary-gold);">Phân tích doanh số Finamex</h3>
+                    <canvas id="mainChart" height="150"></canvas>
+                </div>
+                <div style="background: var(--card-bg); padding: 25px; border-radius: 15px; border: 1px solid #222;">
+                    <h3 style="margin-bottom: 20px; font-family: 'Playfair Display'; color: var(--primary-gold);">Tỷ lệ dòng xe bán chạy</h3>
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="products" class="tab-content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Dòng xe</th>
+                            <th>Màu sắc</th>
+                            <th>Năm SX</th>
+                            <th>Giá niêm yết</th>
+                            <th>Tình trạng</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=200" class="car-thumb">
+                                    <div><strong>Maybach S680</strong><br><small style="color: #666;">Sedan Luxury</small></div>
+                                </div>
+                            </td>
+                            <td>Đen Obsidian</td>
+                            <td>2026</td>
+                            <td>15.9 tỷ</td>
+                            <td><span style="color: #2ed573;">● Sẵn xe</span></td>
+                            <td><i class="fas fa-edit btn-action"></i><i class="fas fa-eye btn-action"></i></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 15px;">
+                                    <img src="https://images.unsplash.com/photo-1520031441872-265e4ff70366?w=200" class="car-thumb">
+                                    <div><strong>AMG G63 Edition 1</strong><br><small style="color: #666;">Off-road Luxury</small></div>
+                                </div>
+                            </td>
+                            <td>Xám Magno</td>
+                            <td>2025</td>
+                            <td>12.5 tỷ</td>
+                            <td><span style="color: #ff4757;">● Đã cọc</span></td>
+                            <td><i class="fas fa-edit btn-action"></i><i class="fas fa-eye btn-action"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="customers" class="tab-content">
+            <div class="customer-grid">
+                <div class="customer-card">
+                    <img src="https://i.pravatar.cc/150?u=1" class="customer-avatar">
+                    <div class="cust-info">
+                        <h4>Nguyễn Hoàng Minh <span class="badge">Diamond</span></h4>
+                        <p>Dòng xe sở hữu: Maybach S450</p>
+                        <p><i class="fas fa-phone"></i> 090.xxxx.123</p>
+                    </div>
+                </div>
+                <div class="customer-card">
+                    <img src="https://i.pravatar.cc/150?u=2" class="customer-avatar">
+                    <div class="cust-info">
+                        <h4>Trần Thị Thu Thảo <span class="badge">Platinum</span></h4>
+                        <p>Dòng xe sở hữu: GLC 300 4MATIC</p>
+                        <p><i class="fas fa-phone"></i> 098.xxxx.456</p>
+                    </div>
+                </div>
+                <div class="customer-card">
+                    <img src="https://i.pravatar.cc/150?u=3" class="customer-avatar">
+                    <div class="cust-info">
+                        <h4>Lê Quang Đại <span class="badge">Gold</span></h4>
+                        <p>Đang quan tâm: EQS 580</p>
+                        <p><i class="fas fa-phone"></i> 091.xxxx.789</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="orders" class="tab-content">
+            <div class="table-container">
+                <p style="padding: 20px; color: #666;">Đang tải danh sách 15 đơn hàng mới nhất từ chi nhánh Finamex...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hiển thị ngày hiện tại
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        // Logic chuyển Tab
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            document.getElementById('page-title').innerText = event.currentTarget.innerText;
+        }
+
+        // Biểu đồ Doanh số (Line Chart)
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Th 10', 'Th 11', 'Th 12', 'Th 1', 'Th 2', 'Th 3'],
+                datasets: [{
+                    label: 'Doanh thu (Tỷ VNĐ)',
+                    data: [25, 32, 50, 42, 38, 45],
+                    borderColor: '#d4af37',
+                    backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                scales: { y: { grid: { color: '#222' } }, x: { grid: { color: '#222' } } }
+            }
+        });
+
+        // Biểu đồ Tròn (Pie Chart)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: ['Maybach', 'Mercedes S', 'Mercedes SUV', 'Xe điện EQ'],
+                datasets: [{
+                    data: [15, 25, 45, 15],
+                    backgroundColor: ['#d4af37', '#8e7941', '#444', '#222'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                plugins: { legend: { position: 'bottom', labels: { color: '#888' } } }
+            }
+        });
+    </script>
+</body>
+</html>
